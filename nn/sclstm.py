@@ -32,7 +32,7 @@ class sclstm(BaseRLG):
                 (self.di,self.dh)).astype(theano.config.floatX))
         # lstm gate weight matrix
         self.Wgate  = theano.shared(0.3 * np.random.uniform(-1.0,1.0,\
-                (self.dh*2+self.dsv,self.dh*3)).astype(theano.config.floatX))
+                (self.dh*2,self.dh*3)).astype(theano.config.floatX))
         # for reading gate
         self.Wrgate = theano.shared(0.3 * np.random.uniform(-1.0,1.0,\
                 (self.dh*2+self.dsv,self.dsv)).\
@@ -99,7 +99,7 @@ class sclstm(BaseRLG):
         # input word embedding
         wv_t = T.nnet.sigmoid(self.Wemb[w_t,:])
         # compute ig, fg, og together and slice it
-        gates_t = T.dot( T.concatenate([wv_t,h_tm1,sv_tm1],axis=1),self.Wgate)
+        gates_t = T.dot( T.concatenate([wv_t,h_tm1],axis=1),self.Wgate)
         ig  = T.nnet.sigmoid(gates_t[:,:self.dh])
         fg  = T.nnet.sigmoid(gates_t[:,self.dh:self.dh*2])
         og  = T.nnet.sigmoid(gates_t[:,self.dh*2:self.dh*3])
@@ -242,7 +242,7 @@ class sclstm(BaseRLG):
         wv_t = sigmoid(self.Wemb_np[node.wordid,:])
         # compute ig, fg, og together and slice it
         gates_t = np.dot( np.concatenate(
-            [wv_t,node.h,node.sv],axis=0),self.Wgate_np)
+            [wv_t,node.h],axis=0),self.Wgate_np)
         ig  = sigmoid(gates_t[:self.dh])
         fg  = sigmoid(gates_t[self.dh:self.dh*2])
         og  = sigmoid(gates_t[self.dh*2:self.dh*3])

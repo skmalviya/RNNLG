@@ -35,7 +35,7 @@
         "screensizerange" : "SLOT_SCREENSIZERANGE"
     },
     "binary"  : {
-        "kidsallowed":["child","kid","kids","children"],
+        "kidsallowed":["child","kid","kids","children","बच्चो","बच्चे","बच्चों","बच्चें","बालक"],
         "dogsallowed":["dog","dogs","puppy"],
         "hasinternet":["internet","wifi"],
         "acceptscreditcards":["card","cards"],

@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 ######################################################################
 ######################################################################
 #  Copyright Tsung-Hsien Wen, Cambridge Dialogue Systems Group, 2016 #
@@ -134,9 +135,9 @@ class HardDActFormatter(DActFormatter):
 
 if __name__ == '__main__':
     #dadp = DialogActDelexicalizedParser()
-    dadp = HardDActFormatter()
+    '''dadp = HardDActFormatter()
 
-    print dadp.format("inform(type='restaurant';count='182';area=dont_care)")
+    #print dadp.format("inform(type='restaurant';count='182';area=dont_care)")
     print dadp.format("reqmore()")
     print dadp.format("request(area)")
     print dadp.format("inform(name='fifth floor';address='hotel palomar 12 fourth street or rosie street')")
@@ -146,3 +147,39 @@ if __name__ == '__main__':
     print dadp.format("?select(battery rating=exceptional;battery rating=standard)")
     print dadp.format("suggest(weight range=heavy;weight range=light weight;weightrange=dontcare)")
     print dadp.format("?compare(name=satellite morpheus 36;warranty=1 year european;dimension=33.7 inch;name=tecra proteus 23;warranty=1 year international;dimension=27.4 inch)")
+    '''
+    dadp = SoftDActFormatter()
+    print 'ghdfjkg'
+    print dadp.parse("inform(type='restaurant';count='182';area=dont_care)")
+    print dadp.parse("inform(type='restaurant';count='182';area=dont_care)")['acttype']
+    print "inform(type='restaurant';count='182';area=dont_care)"
+    print dadp.parse("reqmore()")
+    print dadp.parse("goodbye()")
+    print dadp.parse("request(area)")
+    print dadp.parse("inform(name='fifth floor';address='hotel palomar 12 fourth street or rosie street')")
+    print dadp.parse("inform(name='fifth floor';address='hotel palomar 12 fourth street and rosie street')")
+    print dadp.parse("?select(food=dont_care;food='sea food')")
+    print dadp.parse("?select(food='yes';food='no')")
+    print dadp.parse("inform(name=हांडी;goodformeal=dinner;food=चाइनीस)")
+    fin = open('semo/RNNLG/data/original/restaurant/train.json')
+    print dadp.parse("inform(type='restaurant';count='182';area=dont_care)",keepValues=True)
+    print dadp.format("inform(type='restaurant';count='182';area=dont_care)",keepValues=True)
+    print dadp.parse("inform(name='trattoria contadina';pricerange=moderate)",keepValues=True)
+    h = DialogActParser()
+    
+    print 'dzp' 
+    print dadp.parse(u" inform(name=महाराजा तंदूरी रेस्टोरेंट;kidsallowed=yes;goodformeal=lunch;pricerange=महंगा)",keepValues=True)
+    print h.parse("inform(name='trattoria contadina';pricerange=moderate)")
+    
+
+    '''for i in range(5):
+        fin.readline()
+    data = json.load(fin)
+    fin.close()
+
+    n=0
+    for dact,sent,base in data:
+        n=n+1
+        if n == 6 :
+            break
+        print dadp.parse(dact)'''

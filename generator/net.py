@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 ######################################################################
 ######################################################################
 #  Copyright Tsung-Hsien Wen, Cambridge Dialogue Systems Group, 2016 #
@@ -416,6 +417,64 @@ class Model(object):
     #################################################################
     ####################### Generation ##############################
     #################################################################
+    def loadConverseParams(self):
+        self.model.loadConverseParams()
+
+    def generate(self,dact):
+
+        # format dact
+        feat = self.reader.formatter.format(dact)
+        #try:
+        a,sv,s,v = self.reader.genFeatVec(feat,self.reader.cardinality,self.reader.dfs)
+        #except:
+        #    return ''
+
+        # generate sentences
+        gens = self.model.gen(a,sv,s,v)
+        # for slot error rate scoring
+        felements = [self.reader.cardinality[x+self.reader.dfs[1]]\
+                for x in sv] 
+  
+        # post processing
+        for i in range(len(gens)):
+            penalty, gen = gens[i]
+            # replace word id with actual words
+            gen = ' '.join([self.reader.vocab[x] for x in gen[1:-1]])
+            # score slot error rate
+            cnt, total, caty = self.gentscorer.scoreERR(a,felements,gen)
+            # update score by categorical slot errors
+            penalty += caty
+            # lexicalise back
+            gens[i] = (penalty,self.reader.lexicalise(gen,dact))
+        # get the top-k for evaluation
+        gens = sorted(gens,key=operator.itemgetter(0))[:self.topk]
+        
+        # post editing
+        for i in range(len(gens)):
+            sent = gens[i][1].split()
+            t = 1
+            while t<len(sent):
+                if sent[t]=='-s':
+                    if sent[t-1].endswith('ch') or sent[t-1].endswith('s'):
+                        sent[t-1] += 'es'
+                    else:
+                        sent[t-1] += 's'
+                    del sent[t]
+                elif sent[t]=='-ly':
+                    sent[t-1] += 'ly'
+                    del sent[t]
+                elif sent[t]=='-er':
+                    sent[t-1] += 'er'
+                    del sent[t]
+                elif sent[t]=='s':
+                    sent[t-1] += '\'s'
+                    del sent[t]
+                else:
+                    t +=1
+            gens[i] = ' '.join(sent)
+        return random.choice(gens)
+
+        
     def testNet(self):
         ######## test RNN generator on test set ######### 
         if self.debug:

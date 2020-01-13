@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 ######################################################################
 ######################################################################
 #  Copyright Tsung-Hsien Wen, Cambridge Dialogue Systems Group, 2016 #
@@ -11,6 +12,7 @@ import itertools
 import nltk
 import json
 
+from utils.nlp import *
 
 class DataLexicaliser(object):
 
@@ -37,20 +39,26 @@ class ExactMatchDataLexicaliser(DataLexicaliser):
         # no slot values return directly
         if len(jssv)==1 and jssv[0][1]==None:
             return sent
-        for slot,value in sorted(jssv,key=lambda x:len(x[-1]),reverse=True): 
+        for slot,value in sorted(jssv,key=lambda x:len(x[-1]),reverse=True):
+            # normalize Hindi text in slot-values and sentences.
+            sent, slot, value = hindi_normalize(sent,slot,value,self.special_values)
+            
             if  value in self.special_values : continue # special values, skip       
 
             # taking care of all possible permutations of multiple values
-            vs = value.replace(' or ',' and ').split(' and ')
-            permutations =  [' and '.join(x) for x in itertools.permutations(vs)]+\
-                            [' or '.join(x) for x in itertools.permutations(vs)]
-            
+            if slot != u'goodformeal':
+                value=value.strip()
+                vs = value.replace(' or ',' and ').split(' and ')
+                permutations =  [' and '.join(x) for x in itertools.permutations(vs)]+\
+                                [' or '.join(x) for x in itertools.permutations(vs)]
+            else:
+                permutations =  value
             # try to match for each possible permutation
             isMatched = False
             for p in permutations:
                 if p in sent : # exact match , ends 
                     sent = (' '+sent+' ').replace(\
-                            ' '+p+' ',' SLOT_'+slot.upper()+' ',1)[1:-1]
+                            p,' SLOT_'+slot.upper()+' ',1)[1:-1]
                     isMatched = True
                     break
             if not isMatched: 
@@ -76,5 +84,12 @@ class ExactMatchDataLexicaliser(DataLexicaliser):
         return sent    
 
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
+    print('output')
+    a = DataLexicaliser()
+    b=ExactMatchDataLexicaliser()
+    s2v=[(u'name', u'_'), (u'pricerange', u'_')]
+    print b.delexicalise("b star bar is an asian restaurant", [(u'name', u'b star bar'), (u'food', u'asian')])
+    print len(s2v)
+    print s2v[0][1]
 

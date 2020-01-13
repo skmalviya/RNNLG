@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 ######################################################################
 ######################################################################
 #  Copyright Tsung-Hsien Wen, Cambridge Dialogue Systems Group, 2016 #
@@ -35,15 +36,8 @@ if __name__ == '__main__':
             model.trainNet()
         elif args.mode=='test':
             model.testNet()
-        
-        
-# not supported yet
-"""
-elif args.mode=='realtime':
-    while True:
-        dact=raw_input('Target dialogue act: ')
-        sents, errs = model.genSent(dact)
-        for s in sents:
-            print s
-        print
-"""
+        elif args.mode=='interactive':
+            model.loadConverseParams()
+            while True:
+                da  = raw_input('DAct : ').decode('utf-8')
+                print model.generate(da)        

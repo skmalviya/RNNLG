@@ -1,8 +1,11 @@
+#-*- coding: utf-8 -*-
 ######################################################################
 ######################################################################
 #  Copyright Tsung-Hsien Wen, Cambridge Dialogue Systems Group, 2016 #
 ######################################################################
 ######################################################################
+from __future__ import unicode_literals
+import io
 import os
 import re
 import sys
@@ -215,9 +218,9 @@ class DataReader(object):
         for dact,sent,base in data:
             # word tokens
             sent = self.delexicalise( 
-                    normalize(re.sub(' [\.\?\!]$','',sent)),dact)
+                    re.sub(' [\.\?\!।]$','',sent),dact)#normalize(re.sub(' [\.\?\!]$','',sent)),dact)
             base = self.delexicalise(
-                    normalize(re.sub(' [\.\?\!]$','',base)),dact)
+                    re.sub(' [\.\?\!।]$','',base),dact)#normalize(re.sub(' [\.\?\!]$','',base)),dact)
             feat = self.formatter.format(dact)
             container.append( [feat,dact,sent,base] )
         
@@ -252,8 +255,7 @@ class DataReader(object):
         else:   return container
     
     def _loadVocab(self,vocabfile):
-        
-        fin = file(vocabfile)
+        fin =  io.open(vocabfile, mode="r", encoding="utf-8")
         self.vocab = []#['<unk>','</s>']
         for wrd in fin.readlines():
             wrd = wrd.replace('\n','')
@@ -285,7 +287,7 @@ class DataReader(object):
         return idxmap
 
     def readVecFile(self,filename,vocab):
-        fin = file(filename)
+        fin = io.open(filename, mode="r", encoding="utf-8")
         # discard comment lines
         for i in range(5):
             fin.readline()
@@ -335,6 +337,98 @@ class DataReader(object):
         wordids = [vocab.index(w) if w in vocab else 0 for w in words]
         return wordids
 
+if __name__ == '__main__':
+    
+    b=DataReader(5.0,"restaurant","ml","/home/sumit/semo/RNNLG/resource/vocab","/home/sumit/semo/RNNLG/data/original/restaurant/train.json","/home/sumit/semo/RNNLG/data/original/restaurant/valid.json","/home/sumit/semo/RNNLG/data/original/restaurant/test.json",100,0,4)
+    #b.read(mode='train',batch=10)
+    
+    ''' print b.dfs
+    print 'one'
+    print b.formatter.parse(u" inform(name=महाराजा तंदूरी रेस्टोरेंट;kidsallowed=yes;goodformeal=lunch;pricerange=महंगा)",keepValues=True) #{u'acttype': u'inform', u's2v': [(u'name', u'trattoria contadina'), (u'pricerange', u'moderate')]}
+    print 'two'
+    print b.formatter.parse(u" inform(name=महाराजा तंदूरी रेस्टोरेंट;kidsallowed=yes;goodformeal=lunch;pricerange=महंगा)")#{u'acttype': u'inform', u's2v': [(u'name', u'_'), (u'pricerange', u'_')]}
+    print 'three'
+    print b.formatter.format("inform(name='trattoria contadina';pricerange=moderate)")
+    d=b.formatter.parse(u" inform(name=महाराजा तंदूरी रेस्टोरेंट;kidsallowed=yes;goodformeal=lunch;pricerange=महंगा)",keepValues=True)
+    print d['s2v'][0][1]
+    print d['s2v'][3][1]
+    print 'a'
+    print normalize(re.sub(' [\.\?\!\|।]$','',u"inform(name=पेंगुइन इंडियन एंड मुगल फूड्स;phone=01223 327908)"))
+    print re.sub(' [\.\?\!\|।]$','',u"inform(name=पेंगुइन इंडियन एंड मुगल फूड्स;phone=01223 327908)")
+    print 'b'
+    print b.delexicalise(u"सेवंथ हेवन सस्ता भोजनालय है जो सिविल लाइंस में है ।",u" inform(name=सेवंथ हेवन;area= सिविल लाइंस;pricerange=सस्ता)")
+    #print repr(d).decode('unicode-escape')
+    
+    print 'a'
+    print b.formatter.parse('goodbye()',keepValues=True)
+    print b.formatter.parse('?request(near)',keepValues=True)
+    print b.formatter.parse("inform(name='gracias madre';address='2211 mission street')",keepValues=True)
+    print b.formatter.parse("?select(kidsallowed='yes';kidsallowed='no')",keepValues=True)
+        
+    print b.delexicalise(u"महाराजा तंदूरी रेस्टोरेंट दोपहर के भोजन के लिए अच्छा और महंगा मूल्यसीमा वाला भोजनालय है, जहाँ बच्चों का प्रवेश भी वर्जित नहीं है ।",u" inform(name=महाराजा तंदूरी रेस्टोरेंट;kidsallowed=yes;goodformeal=lunch;pricerange=महंगा)")
+    '''
+    print '========================'
+    print b.delexicalise(u"हॉटस्पॉट का पता अल्लापुर, इलाहाबाद, कॉन्टैक्ट नं. 01733 553355 है , पोस्टकोड 294105 है।",u"inform(name=हॉटस्पॉट;address=अल्लापुर, इलाहाबाद;phone=01733 553355;postcode=294105)")
+    #print a.cardinality
+    '''lexiclise_sent=[]
+    file1 = '/home/sumit/Desktop/hindi_semo/rest_train_data.json'
+    file2 = '/home/sumit/Desktop/hindi_semo/delex_rest_train_data.json'
+    file3 = '/home/sumit/Desktop/hindi_semo/delex_rest_train_data.txt'
+    fin_json=open(file1,'r')
+    fin_json.readline()
+    
+    fin_delex_json=open(file2,'a')
+    fin_text = open(file3,'a')
+    y = json.load(fin_json)
+    i=1
+    for element in y:
+        print '888888888888888888888888888888888888888888888888888888888'
+        print i 
+        print element[0]
+        print element[1]
+        print normalize(re.sub(' [\.\?\!\|]$','',element[1]))
+        i=i+1
+        sent = b.delexicalise(normalize(re.sub(' [\.\?\!\|]$','',element[1])),element[0])
+        lexiclise_sent.append(sent) 
+        fin_text.write(('\"'+sent.strip() + '\"\n').encode('utf8'))  
+    
+    
+    y_delex = json.dumps(lexiclise_sent)
+    fin_delex_json.write(y_delex)
 
+    fin = open('/home/sumit/semo1/RNNLG/data/original/restaurant/train.json')
+    
+    
+        # remove comment line
+    
+    
+    for i in range(5):
+        fin.readline()
+    data = json.load(fin)
+    fin.close()
+    document = Document()
+    n=1
+    a,sv,s,v, words, dact, base, b_size, lengs = b.read(mode='train',batch=5)
+    print'***************************************************************************************************************'
+    print'a=',a
+    print'sv=',sv
+    print's=',s
+    print'v=',v
+    print 'words=',words
+    print 'dact=',repr(dact).decode('unicode-escape')
+    print 'base=-',repr(base).decode('unicode-escape')
+    print 'b_size= ',b_size
+    print 'lengs= ',lengs
+    print 'indexmap ='
+    # idxmap = b.tokenMap2Indexes()
+    #print idxmap
+    b._loadTokenMap()
+    b.genFeatVec(b.feat,b.cardinality,b.dfs)
+    [
+    " inform(name=महाराजा तंदूरी रेस्टोरेंट;kidsallowed=yes;goodformeal=lunch;pricerange=महंगा;)",
+    "महाराजा तंदूरी रेस्टोरेंट दोपहर के भोजन के लिए अच्छा और मध्यम मूल्यसीमा वाला भोजनालय है, जहाँ बच्चों का प्रवेश भी वर्जित नहीं है ।",
+    " महाराजा तंदूरी रेस्टोरेंट दोपहर के भोजन के लिए अच्छा और मध्यम मूल्यसीमा वाला भोजनालय है, जहाँ बच्चों का प्रवेश भी वर्जित नहीं है ।"
+    ],'''
+    #print repr(b.vocab).decode('unicode-escape')
 
 

@@ -12,6 +12,7 @@ from collections import OrderedDict
 from basic  import *
 from hlstm  import *
 from sclstm import *
+from msclstm import *
 from encdec import *
 
 class NNGenerator(object):
@@ -32,7 +33,12 @@ class NNGenerator(object):
         
         # choose generator architecture
         self.params = []
-        if self.gentype=='sclstm':
+        if self.gentype=='msclstm':
+            self.generator = msclstm(self.gentype,vocab,
+                    beamwidth,overgen,
+                    self.di,self.dh,self.db,self.dfs)
+            self.params = self.generator.params
+        elif self.gentype=='sclstm':
             self.generator = sclstm(self.gentype,vocab,
                     beamwidth,overgen,
                     self.di,self.dh,self.db,self.dfs)
@@ -67,7 +73,10 @@ class NNGenerator(object):
         reg  = T.scalar('reg')
 
         # unroll generator and produce cost
-        if self.gentype=='sclstm':
+        if self.gentype=='msclstm':
+            self.cost, cutoff_logp = \
+                    self.generator.unroll(a,sv,w_idxes,cutoff_f,cutoff_b)
+        elif self.gentype=='sclstm':
             self.cost, cutoff_logp = \
                     self.generator.unroll(a,sv,w_idxes,cutoff_f,cutoff_b)
         elif self.gentype=='encdec':
@@ -126,14 +135,18 @@ class NNGenerator(object):
 
     def gen(self,a,sv,s,v):
         if self.decode=='beam':
-            if self.gentype=='sclstm':
+            if self.gentype=='msclstm':
+                return self.generator.beamSearch(a,sv)
+            elif self.gentype=='sclstm':
                 return self.generator.beamSearch(a,sv)
             elif self.gentype=='encdec':
                 return self.generator.beamSearch(a,s,v)
             elif self.gentype=='hlstm':
                 return self.generator.beamSearch(a,sv)
         else:
-            if self.gentype=='sclstm':
+            if self.gentype=='msclstm':
+                return self.generator.sample(a,sv)
+            elif self.gentype=='sclstm':
                 return self.generator.sample(a,sv)
             elif self.gentype=='encdec':
                 return self.generator.sample(a,s,v)
