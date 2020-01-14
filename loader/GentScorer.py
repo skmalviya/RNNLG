@@ -88,9 +88,9 @@ class ERRScorer():
         # when ?select/suggest act, only consider categorical errors
         if a==[4] or a==[14]:
             #return slot_count, caty_slot_error, caty_slot_error
-            return 0.0,0.0,0.0
+            return 0.0,0.0,0.0,0.0
         else:
-            return slot_count, total_slot_error, caty_slot_error
+            return slot_count, total_slot_error, caty_slot_error, bnay_slot_error
 
 class BLEUScorer(object):
     ## BLEU score calculator via GentScorer interface

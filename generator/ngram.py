@@ -95,7 +95,7 @@ class Ngram(object):
         # container
         parallel_corpus, hdc_corpus = [], []
         # slot error counts
-        gencnts, refcnts = [0.0,0.0,0.0],[0.0,0.0,0.0]
+        gencnts, refcnts = [0.0,0.0,0.0,0.0],[0.0,0.0,0.0,0.0]
 
         while True:
             # read data point
@@ -133,7 +133,7 @@ class Ngram(object):
                 # replace word id with actual words
                 gen = ' '.join([x for x in gen[1:-1]])
                 # score slot error rate
-                cnt, total, caty = self.gentscorer.scoreERR(a,felements,gen)
+                cnt, total, caty, bnay = self.gentscorer.scoreERR(a,felements,gen)
                 # update score by categorical slot errors
                 penalty += caty
                 # lexicalise back
@@ -145,23 +145,25 @@ class Ngram(object):
             print 'Penalty\tTSER\tASER\tGen'
             for penalty, gen in gens:
                 # score slot error rate
-                cnt, total, caty = self.gentscorer.scoreERR(a,felements,
+                cnt, total, caty, bnay = self.gentscorer.scoreERR(a,felements,
                         self.reader.delexicalise(gen,dact))
                 # accumulate slot error cnts
                 gencnts[0]  += cnt
                 gencnts[1]  += total
                 gencnts[2]  += caty
+                gencnts[3]  += bnay
                 print '%.4f\t%d\t%d\t%s' % (penalty,total,caty,gen)
             print '\n'
             # compute gold standard slot error rate
             for sent in sents:
                 # score slot error rate
-                cnt, total, caty = self.gentscorer.scoreERR(a,felements,
+                cnt, total, caty, bnay = self.gentscorer.scoreERR(a,felements,
                         self.reader.delexicalise(sent,dact))
                 # accumulate slot error cnts
                 refcnts[0]  += cnt
                 refcnts[1]  += total
                 refcnts[2]  += caty
+                refcnts[3]  += bnay
             # accumulate score for bleu score computation         
             parallel_corpus.append([[g for s,g in gens],sents])
             hdc_corpus.append([bases[:1],sents])
@@ -171,13 +173,13 @@ class Ngram(object):
         print '##############################################'
         print 'BLEU SCORE & SLOT ERROR on GENERATED SENTENCES'
         print '##############################################'
-        print 'Metric       :\tBLEU\tT.ERR\tA.ERR'
-        print 'HDC          :\t%.4f\t%2.2f%%\t%2.2f%%'% (bleuHDC,0.0,0.0)
-        print 'Ref          :\t%.4f\t%2.2f%%\t%2.2f%%'% (1.0,
-                100*refcnts[1]/refcnts[0],100*refcnts[2]/refcnts[0])
+        print 'Metric       :\tBLEU\tT.ERR\tS.ERR\tB.ERR'
+        print 'HDC          :\t%.4f\t%2.2f%%\t%2.2f%%\t%2.2f%%'% (bleuHDC,0.0,0.0,0.0)
+        print 'Ref          :\t%.4f\t%2.2f%%\t%2.2f%%\t%2.2f%%'% (1.0,
+                100*refcnts[1]/refcnts[0],100*refcnts[2]/refcnts[0],100*refcnts[3]/refcnts[0])
         print '----------------------------------------------'
-        print 'This Model   :\t%.4f\t%2.2f%%\t%2.2f%%'% (bleuModel,
-                100*gencnts[1]/gencnts[0],100*gencnts[2]/gencnts[0])
+        print 'This Model   :\t%.4f\t%2.2f%%\t%2.2f%%\t%2.2f%%'% (bleuModel,
+                100*gencnts[1]/gencnts[0],100*gencnts[2]/gencnts[0],100*gencnts[3]/gencnts[0])
 
     def setupSideOperators(self):
         # initialise data reader
