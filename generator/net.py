@@ -441,7 +441,7 @@ class Model(object):
             # replace word id with actual words
             gen = ' '.join([self.reader.vocab[x] for x in gen[1:-1]])
             # score slot error rate
-            cnt, total, caty, bnay = self.gentscorer.scoreERR(a,felements,words)
+            cnt, total, caty, bnay = self.gentscorer.scoreERR(a,felements,gen)
             # update score by categorical slot errors
             penalty += caty
             # lexicalise back
