@@ -6,3 +6,5 @@ python2/*
 *.sh.e*
 *.sh.o*
 *.pyc
+*.png
+*.pdf
