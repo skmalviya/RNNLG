@@ -23,7 +23,7 @@ fout_name=input()#150-2 ,150-1
 print('150,100')
 size=input()#150.100
 
-file1 = 'semo/RNNLG/data/original/restaurant/corrected_data/delex_dactforexperi_'+fin_name+'.json'  #file for list of delexiclise sentence
+file1 = 'delex_dactforexperi_'+fin_name+'.json'  #file for list of delexiclise sentence
 file2 = 'semo/RNNLG/vec/hindi_wordtovec-'+fout_name+'.txt'   # file where w2v will be saved.
 fin_json=open(file1,'r')
 fin_text=open(file2,'a')
